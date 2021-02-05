@@ -3,9 +3,9 @@ import logging
 import azure.functions as func
 from pathlib import Path
 from ai import Predictor
-import requests
 import tempfile
 import json
+from PredictBearType.utils import download_file
 
 
 # https://docs.microsoft.com/en-us/azure/azure-functions/machine-learning-pytorch?tabs=bash#update-the-function-to-run-predictions
@@ -17,16 +17,11 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     if not image_url:
         logging.error('No image URL in request.')
         return func.HttpResponse(status_code=400)
-    logging.info(f'Image URL received: {image_url}. Downloading...')
-    r = requests.get(image_url)
-    logging.info(f'Status code {r.status_code}.')
+    logging.info(f'Image URL received: {image_url}.')
     
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        tmpdir = Path(tmpdirname)
-        content_file = tmpdir / 'content'
-        logging.info(f'Saving to {content_file}.')
-        with content_file.open('wb') as f:
-            f.write(r.content)
+    with tempfile.NamedTemporaryFile() as content_file:
+        logging.info(f'Downloading to {content_file}.')
+        download_file(content_file, image_url)
         results = predictor.predict(content_file)
         logging.info(results)
     
