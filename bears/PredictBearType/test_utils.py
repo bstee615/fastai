@@ -9,6 +9,10 @@ class TestUtils(unittest.TestCase):
             tempdir = Path(tempdir_path)
             download_file(tempdir/'content', 'https://www.expresstorussia.com/files/pages/015159.jpg')
 
+    def test_invalid_url(self):
+        with tempfile.TemporaryDirectory() as tempdir_path:
+            self.assertRaises(AssertionError, lambda: download_file(Path(tempdir_path)/'content', 'https://google.com'))
+
     def test_not_url(self):
         with tempfile.TemporaryDirectory() as tempdir_path:
             self.assertRaises(AssertionError, lambda: download_file(Path(tempdir_path)/'content', 'hello!'))

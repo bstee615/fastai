@@ -1,4 +1,4 @@
-from fastai.learner import *
+from fastai.learner import load_learner
 from pathlib import Path
 import pathlib
 import os
