@@ -64,7 +64,7 @@
                 success: function(e) {
                     $loading.replaceWith(`<strong class="short">${e.prediction}</strong>`);
                 },
-                err: function(e) {
+                error: function(e) {
                     $loading.replaceWith(`<strong style="color: red" class="short">${e}</strong>`);
                 }
             });
