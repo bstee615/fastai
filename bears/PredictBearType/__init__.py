@@ -15,15 +15,20 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     image_url = req.params.get('img')
     if not image_url:
-        logging.error('No image URL in request.')
-        return func.HttpResponse(status_code=400)
+        errMsg = 'No image URL in request.'
+        logging.error(errMsg)
+        return func.HttpResponse(json.dumps({"error": errMsg}), status_code=400)
     logging.info(f'Image URL received: {image_url}.')
     
     with tempfile.TemporaryDirectory() as content_dir_path:
         content_dir = Path(content_dir_path)
         content_file = content_dir / 'content'
         logging.info(f'Downloading to {content_file}.')
-        download_file(content_file, image_url)
+        try:
+            download_file(content_file, image_url)
+        except AssertionError:
+            logging.error(f'Invalid image URL: {image_url}')
+            return func.HttpResponse(json.dumps({"error": 'Invalid image URL'}), status_code=400)
         results = predictor.predict(content_file)
         logging.info(results)
     

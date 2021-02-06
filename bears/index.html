@@ -49,10 +49,14 @@
             }
 
             fetch(predictUrl)
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-                $("#results").append(lineItem(`<strong class="short">${data.prediction}</strong>`));
+            .then(response => response.json().then(content => ({status: response.status, content: content})))
+            .then(responseData => {
+                if (responseData.status == 200) {
+                    $("#results").append(lineItem(`<strong class="short">${responseData.content.prediction}</strong>`));
+                }
+                else {
+                    throw responseData.content.error
+                }
             })
             .catch(err => {
                 $("#results").append(lineItem(`<strong style="color: red" class="short">${err}</strong>`));
