@@ -3,11 +3,12 @@ import requests
 import validators
 
 
-def download_file(fd, url):
+def download_file(file, url):
     """
     Download a file to local storage.
     """
     assert validators.url(url)
     r = requests.get(url)
     logging.info(f'Status code {r.status_code}.')
-    fd.write(r.content)
+    with file.open('wb') as f:
+        f.write(r.content)

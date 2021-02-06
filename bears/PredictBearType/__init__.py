@@ -19,7 +19,9 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(status_code=400)
     logging.info(f'Image URL received: {image_url}.')
     
-    with tempfile.NamedTemporaryFile() as content_file:
+    with tempfile.TemporaryDirectory() as content_dir_path:
+        content_dir = Path(content_dir_path)
+        content_file = content_dir / 'content'
         logging.info(f'Downloading to {content_file}.')
         download_file(content_file, image_url)
         results = predictor.predict(content_file)
