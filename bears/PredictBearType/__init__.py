@@ -13,7 +13,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     model_path = Path('models/bears.pkl')
     predictor = Predictor(model_path)
 
-    image_url = req.params.get('img')
+    image_url = req.params.get('url')
     if not image_url:
         errMsg = 'No image URL in request.'
         logging.error(errMsg)

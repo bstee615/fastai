@@ -24,8 +24,10 @@
     <h1>What type of bear am I?</h1>
     <!-- Right now, we can classify images from URLs on the Web. -->
     <label for="url">Image URL of a bear to classify:</label>
-    <input type="text" name="url" id="url">
-    <button onclick="submitUrl()">Submit</button>
+    <form id="urlForm">
+        <input type="text" name="url" id="inputUrl">
+        <button type="submit" name="submit">Submit</button>
+    </form>
     <div id="results"></div>
     <!-- TODO: Show the image once a URL is typed. -->
     <!-- TODO: Add URL upload so we can do more images. -->
@@ -39,29 +41,36 @@
         const functionsHostname = isLocalhost ? "http://localhost:7071" : "https://fastai-predict.azurewebsites.net";
         console.log(`running locally: ${isLocalhost}`);
         console.log(`Functions host: ${functionsHostname}`);
+        const functionsApiUrl = `${functionsHostname}/api/PredictBearType`;
+        let lineItemCounter = 0;
 
-        function submitUrl() {
-            const imgUrl = $("#url").val();
-            predictUrl = `${functionsHostname}/api/PredictBearType?img=${imgUrl}`;
-            
+        $('#urlForm').submit(function(e) {
+            e.preventDefault();
+
+            const myCounter = lineItemCounter ++;
+            const imgUrl = $("#urlForm > input[name=url]").val();
             function lineItem(content) {
                 return `<div class="short-container"><a class="short" href="${imgUrl}">${imgUrl}</a>:${content}</div>`
             }
 
-            fetch(predictUrl)
-            .then(response => response.json().then(content => ({status: response.status, content: content})))
-            .then(responseData => {
-                if (responseData.status == 200) {
-                    $("#results").append(lineItem(`<strong class="short">${responseData.content.prediction}</strong>`));
+            const myId = `loading${myCounter}`;
+            $("#results").append(lineItem(`<div id="${myId}">Loading...</div>`));
+            const $loading = $(`#${myId}`);
+            
+            $.ajax({
+                url: functionsApiUrl,
+                type: 'get',
+                data: $('#urlForm').serialize(),
+                success: function(e) {
+                    $loading.replaceWith(`<strong class="short">${e.prediction}</strong>`);
+                },
+                err: function(e) {
+                    $loading.replaceWith(`<strong style="color: red" class="short">${e}</strong>`);
                 }
-                else {
-                    throw responseData.content.error
-                }
-            })
-            .catch(err => {
-                $("#results").append(lineItem(`<strong style="color: red" class="short">${err}</strong>`));
             });
-        }
+
+            return false;
+        });
     </script>
 </body>
 
