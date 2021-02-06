@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>Bear classifier</title>
+    <meta name="description" content="Bear classifier">
+    <meta name="author" content="Benjamin Steenhoek">
+</head>
+
+<body>
+    <!-- Right now, we can classify images from URLs on the Web. -->
+    <label for="url">Image URL of a bear to classify:</label>
+    <input type="text" name="url" id="url">
+    <button onclick="submitUrl()">Submit</button>
+    <!-- TODO: Show the image once a URL is typed. -->
+    <!-- TODO: Add URL upload so we can do more images. -->
+    <script>
+        // const host = 'https://fastai-predict.azurewebsites.net';
+        const host = 'http://localhost:7071';
+
+        function submitUrl() {
+            const imgUrl = document.getElementById("url").value;
+            predictUrl = `${host}/api/PredictBearType?img=${imgUrl}`;
+            fetch(predictUrl)
+            .then(response => response.json())
+            .then(data => console.log(data));
+        }
+    </script>
+</body>
+
+</html>
